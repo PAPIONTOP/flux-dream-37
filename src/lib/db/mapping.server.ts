@@ -27,7 +27,7 @@ export const mapping = {
     const { error } = await sb
       .from("tmdb_mapping" as never)
       .upsert(
-        { tmdb_id: tmdbId, media_type: mediaType, source_slug: slug },
+        { tmdb_id: tmdbId, media_type: mediaType, source_slug: slug } as never,
         { onConflict: "tmdb_id,media_type" },
       );
     if (error) logger.warn("mapping_upsert_error", { tmdbId, error: error.message });

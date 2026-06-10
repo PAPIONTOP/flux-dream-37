@@ -36,7 +36,7 @@ export const kv = {
     const expires_at = new Date(Date.now() + ttlSec * 1000).toISOString();
     const { error } = await sb
       .from("cache_kv" as never)
-      .upsert({ k: key, v: value as never, expires_at }, { onConflict: "k" });
+      .upsert({ k: key, v: value as never, expires_at } as never, { onConflict: "k" });
     if (error) logger.warn("kv_set_error", { key, error: error.message });
   },
 

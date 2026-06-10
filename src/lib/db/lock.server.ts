@@ -24,7 +24,7 @@ export const lock = {
 
     const { error } = await sb
       .from("scraper_lock" as never)
-      .insert({ k: key, expires_at });
+      .insert({ k: key, expires_at } as never);
     if (error) {
       // Most likely PK conflict — lock is held.
       logger.debug("lock_busy", { key });
