@@ -10,33 +10,183 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicV1OpenapiDotjsonRouteImport } from './routes/api/public/v1/openapi[.]json'
+import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
+import { Route as ApiPublicV1TvIndexRouteImport } from './routes/api/public/v1/tv.index'
+import { Route as ApiPublicV1MovieIndexRouteImport } from './routes/api/public/v1/movie.index'
+import { Route as ApiPublicV1TvSearchRouteImport } from './routes/api/public/v1/tv.search'
+import { Route as ApiPublicV1MovieSearchRouteImport } from './routes/api/public/v1/movie.search'
+import { Route as ApiPublicV1AdminSourceRouteImport } from './routes/api/public/v1/admin.source'
+import { Route as ApiPublicV1AdminCacheRouteImport } from './routes/api/public/v1/admin.cache'
+import { Route as ApiPublicV1ProxyTokenSplatRouteImport } from './routes/api/public/v1/proxy.$token.$'
+import { Route as ApiPublicV1AdminScraperTestRouteImport } from './routes/api/public/v1/admin.scraper.test'
+import { Route as ApiPublicV1AdminCacheTmdb_idRouteImport } from './routes/api/public/v1/admin.cache.$tmdb_id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1OpenapiDotjsonRoute =
+  ApiPublicV1OpenapiDotjsonRouteImport.update({
+    id: '/api/public/v1/openapi.json',
+    path: '/api/public/v1/openapi.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
+  id: '/api/public/v1/health',
+  path: '/api/public/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1TvIndexRoute = ApiPublicV1TvIndexRouteImport.update({
+  id: '/api/public/v1/tv/',
+  path: '/api/public/v1/tv/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1MovieIndexRoute = ApiPublicV1MovieIndexRouteImport.update({
+  id: '/api/public/v1/movie/',
+  path: '/api/public/v1/movie/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1TvSearchRoute = ApiPublicV1TvSearchRouteImport.update({
+  id: '/api/public/v1/tv/search',
+  path: '/api/public/v1/tv/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1MovieSearchRoute = ApiPublicV1MovieSearchRouteImport.update({
+  id: '/api/public/v1/movie/search',
+  path: '/api/public/v1/movie/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1AdminSourceRoute = ApiPublicV1AdminSourceRouteImport.update({
+  id: '/api/public/v1/admin/source',
+  path: '/api/public/v1/admin/source',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1AdminCacheRoute = ApiPublicV1AdminCacheRouteImport.update({
+  id: '/api/public/v1/admin/cache',
+  path: '/api/public/v1/admin/cache',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1ProxyTokenSplatRoute =
+  ApiPublicV1ProxyTokenSplatRouteImport.update({
+    id: '/api/public/v1/proxy/$token/$',
+    path: '/api/public/v1/proxy/$token/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1AdminScraperTestRoute =
+  ApiPublicV1AdminScraperTestRouteImport.update({
+    id: '/api/public/v1/admin/scraper/test',
+    path: '/api/public/v1/admin/scraper/test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1AdminCacheTmdb_idRoute =
+  ApiPublicV1AdminCacheTmdb_idRouteImport.update({
+    id: '/$tmdb_id',
+    path: '/$tmdb_id',
+    getParentRoute: () => ApiPublicV1AdminCacheRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
+  '/api/public/v1/admin/cache': typeof ApiPublicV1AdminCacheRouteWithChildren
+  '/api/public/v1/admin/source': typeof ApiPublicV1AdminSourceRoute
+  '/api/public/v1/movie/search': typeof ApiPublicV1MovieSearchRoute
+  '/api/public/v1/tv/search': typeof ApiPublicV1TvSearchRoute
+  '/api/public/v1/movie/': typeof ApiPublicV1MovieIndexRoute
+  '/api/public/v1/tv/': typeof ApiPublicV1TvIndexRoute
+  '/api/public/v1/admin/cache/$tmdb_id': typeof ApiPublicV1AdminCacheTmdb_idRoute
+  '/api/public/v1/admin/scraper/test': typeof ApiPublicV1AdminScraperTestRoute
+  '/api/public/v1/proxy/$token/$': typeof ApiPublicV1ProxyTokenSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
+  '/api/public/v1/admin/cache': typeof ApiPublicV1AdminCacheRouteWithChildren
+  '/api/public/v1/admin/source': typeof ApiPublicV1AdminSourceRoute
+  '/api/public/v1/movie/search': typeof ApiPublicV1MovieSearchRoute
+  '/api/public/v1/tv/search': typeof ApiPublicV1TvSearchRoute
+  '/api/public/v1/movie': typeof ApiPublicV1MovieIndexRoute
+  '/api/public/v1/tv': typeof ApiPublicV1TvIndexRoute
+  '/api/public/v1/admin/cache/$tmdb_id': typeof ApiPublicV1AdminCacheTmdb_idRoute
+  '/api/public/v1/admin/scraper/test': typeof ApiPublicV1AdminScraperTestRoute
+  '/api/public/v1/proxy/$token/$': typeof ApiPublicV1ProxyTokenSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
+  '/api/public/v1/admin/cache': typeof ApiPublicV1AdminCacheRouteWithChildren
+  '/api/public/v1/admin/source': typeof ApiPublicV1AdminSourceRoute
+  '/api/public/v1/movie/search': typeof ApiPublicV1MovieSearchRoute
+  '/api/public/v1/tv/search': typeof ApiPublicV1TvSearchRoute
+  '/api/public/v1/movie/': typeof ApiPublicV1MovieIndexRoute
+  '/api/public/v1/tv/': typeof ApiPublicV1TvIndexRoute
+  '/api/public/v1/admin/cache/$tmdb_id': typeof ApiPublicV1AdminCacheTmdb_idRoute
+  '/api/public/v1/admin/scraper/test': typeof ApiPublicV1AdminScraperTestRoute
+  '/api/public/v1/proxy/$token/$': typeof ApiPublicV1ProxyTokenSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
+    | '/api/public/v1/admin/cache'
+    | '/api/public/v1/admin/source'
+    | '/api/public/v1/movie/search'
+    | '/api/public/v1/tv/search'
+    | '/api/public/v1/movie/'
+    | '/api/public/v1/tv/'
+    | '/api/public/v1/admin/cache/$tmdb_id'
+    | '/api/public/v1/admin/scraper/test'
+    | '/api/public/v1/proxy/$token/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
+    | '/api/public/v1/admin/cache'
+    | '/api/public/v1/admin/source'
+    | '/api/public/v1/movie/search'
+    | '/api/public/v1/tv/search'
+    | '/api/public/v1/movie'
+    | '/api/public/v1/tv'
+    | '/api/public/v1/admin/cache/$tmdb_id'
+    | '/api/public/v1/admin/scraper/test'
+    | '/api/public/v1/proxy/$token/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
+    | '/api/public/v1/admin/cache'
+    | '/api/public/v1/admin/source'
+    | '/api/public/v1/movie/search'
+    | '/api/public/v1/tv/search'
+    | '/api/public/v1/movie/'
+    | '/api/public/v1/tv/'
+    | '/api/public/v1/admin/cache/$tmdb_id'
+    | '/api/public/v1/admin/scraper/test'
+    | '/api/public/v1/proxy/$token/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
+  ApiPublicV1OpenapiDotjsonRoute: typeof ApiPublicV1OpenapiDotjsonRoute
+  ApiPublicV1AdminCacheRoute: typeof ApiPublicV1AdminCacheRouteWithChildren
+  ApiPublicV1AdminSourceRoute: typeof ApiPublicV1AdminSourceRoute
+  ApiPublicV1MovieSearchRoute: typeof ApiPublicV1MovieSearchRoute
+  ApiPublicV1TvSearchRoute: typeof ApiPublicV1TvSearchRoute
+  ApiPublicV1MovieIndexRoute: typeof ApiPublicV1MovieIndexRoute
+  ApiPublicV1TvIndexRoute: typeof ApiPublicV1TvIndexRoute
+  ApiPublicV1AdminScraperTestRoute: typeof ApiPublicV1AdminScraperTestRoute
+  ApiPublicV1ProxyTokenSplatRoute: typeof ApiPublicV1ProxyTokenSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +198,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/openapi.json': {
+      id: '/api/public/v1/openapi.json'
+      path: '/api/public/v1/openapi.json'
+      fullPath: '/api/public/v1/openapi.json'
+      preLoaderRoute: typeof ApiPublicV1OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/health': {
+      id: '/api/public/v1/health'
+      path: '/api/public/v1/health'
+      fullPath: '/api/public/v1/health'
+      preLoaderRoute: typeof ApiPublicV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/tv/': {
+      id: '/api/public/v1/tv/'
+      path: '/api/public/v1/tv'
+      fullPath: '/api/public/v1/tv/'
+      preLoaderRoute: typeof ApiPublicV1TvIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/movie/': {
+      id: '/api/public/v1/movie/'
+      path: '/api/public/v1/movie'
+      fullPath: '/api/public/v1/movie/'
+      preLoaderRoute: typeof ApiPublicV1MovieIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/tv/search': {
+      id: '/api/public/v1/tv/search'
+      path: '/api/public/v1/tv/search'
+      fullPath: '/api/public/v1/tv/search'
+      preLoaderRoute: typeof ApiPublicV1TvSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/movie/search': {
+      id: '/api/public/v1/movie/search'
+      path: '/api/public/v1/movie/search'
+      fullPath: '/api/public/v1/movie/search'
+      preLoaderRoute: typeof ApiPublicV1MovieSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/admin/source': {
+      id: '/api/public/v1/admin/source'
+      path: '/api/public/v1/admin/source'
+      fullPath: '/api/public/v1/admin/source'
+      preLoaderRoute: typeof ApiPublicV1AdminSourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/admin/cache': {
+      id: '/api/public/v1/admin/cache'
+      path: '/api/public/v1/admin/cache'
+      fullPath: '/api/public/v1/admin/cache'
+      preLoaderRoute: typeof ApiPublicV1AdminCacheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/proxy/$token/$': {
+      id: '/api/public/v1/proxy/$token/$'
+      path: '/api/public/v1/proxy/$token/$'
+      fullPath: '/api/public/v1/proxy/$token/$'
+      preLoaderRoute: typeof ApiPublicV1ProxyTokenSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/admin/scraper/test': {
+      id: '/api/public/v1/admin/scraper/test'
+      path: '/api/public/v1/admin/scraper/test'
+      fullPath: '/api/public/v1/admin/scraper/test'
+      preLoaderRoute: typeof ApiPublicV1AdminScraperTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/admin/cache/$tmdb_id': {
+      id: '/api/public/v1/admin/cache/$tmdb_id'
+      path: '/$tmdb_id'
+      fullPath: '/api/public/v1/admin/cache/$tmdb_id'
+      preLoaderRoute: typeof ApiPublicV1AdminCacheTmdb_idRouteImport
+      parentRoute: typeof ApiPublicV1AdminCacheRoute
+    }
   }
 }
 
+interface ApiPublicV1AdminCacheRouteChildren {
+  ApiPublicV1AdminCacheTmdb_idRoute: typeof ApiPublicV1AdminCacheTmdb_idRoute
+}
+
+const ApiPublicV1AdminCacheRouteChildren: ApiPublicV1AdminCacheRouteChildren = {
+  ApiPublicV1AdminCacheTmdb_idRoute: ApiPublicV1AdminCacheTmdb_idRoute,
+}
+
+const ApiPublicV1AdminCacheRouteWithChildren =
+  ApiPublicV1AdminCacheRoute._addFileChildren(
+    ApiPublicV1AdminCacheRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
+  ApiPublicV1OpenapiDotjsonRoute: ApiPublicV1OpenapiDotjsonRoute,
+  ApiPublicV1AdminCacheRoute: ApiPublicV1AdminCacheRouteWithChildren,
+  ApiPublicV1AdminSourceRoute: ApiPublicV1AdminSourceRoute,
+  ApiPublicV1MovieSearchRoute: ApiPublicV1MovieSearchRoute,
+  ApiPublicV1TvSearchRoute: ApiPublicV1TvSearchRoute,
+  ApiPublicV1MovieIndexRoute: ApiPublicV1MovieIndexRoute,
+  ApiPublicV1TvIndexRoute: ApiPublicV1TvIndexRoute,
+  ApiPublicV1AdminScraperTestRoute: ApiPublicV1AdminScraperTestRoute,
+  ApiPublicV1ProxyTokenSplatRoute: ApiPublicV1ProxyTokenSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
