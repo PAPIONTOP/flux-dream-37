@@ -1,26 +1,62 @@
-import process from "node:process";
-
-// Server-only config. The .server.ts suffix prevents Vite from bundling
-// this file into the client — values here never reach the browser.
-//
-// On Cloudflare Workers, env binds at REQUEST time. Module-scope reads
-// (e.g. `const x = process.env.X`) resolve to undefined — always read
-// process.env INSIDE a function or handler.
-//
-// When to use which env-access pattern:
-//   - .server.ts module (this file): server-only helpers reused across
-//     handlers. Wrap reads in a function so they run per-request.
-//   - inline process.env inside a createServerFn handler: one-off reads
-//     not reused elsewhere.
-//   - import.meta.env.VITE_FOO: PUBLIC config readable from both client
-//     and server (analytics IDs, public URLs). Define in .env with the
-//     VITE_ prefix. Never put secrets here — they ship to the browser.
-
-export function getServerConfig() {
-  return {
-    nodeEnv: process.env.NODE_ENV,
-    // Add server-only values here, e.g.:
-    //   databaseUrl: process.env.DATABASE_URL,
-    //   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+/**
+ * Reads & validates required env vars. Call inside server-only handlers,
+ * not at module scope of client-reachable files.
+ */
+export interface RuntimeConfig {
+  tmdbApiKey: string;
+  apiKey: string;
+  adminKey: string;
+  jwtSecret: string;
+  source: {
+    baseUrl: string;
+    moviePath: string;
+    seriesPath: string;
+    userAgent: string;
+    cookies: string;
   };
+  streamCacheTtl: number;
+  proxyTokenTtl: number;
+  scraperConcurrency: number;
+}
+
+function req(name: string, fallback?: string): string {
+  const v = process.env[name] ?? fallback;
+  if (v == null || v === "") {
+    throw new Error(`Missing required env var: ${name}`);
+  }
+  return v;
+}
+
+export function getConfig(): RuntimeConfig {
+  return {
+    tmdbApiKey: req("TMDB_API_KEY"),
+    apiKey: req("API_KEY"),
+    adminKey: req("ADMIN_KEY"),
+    jwtSecret: req("JWT_SECRET"),
+    source: {
+      baseUrl: req("SOURCE_BASE_URL").replace(/\/$/, ""),
+      moviePath: req("SOURCE_MOVIE_PATH", "/film/{slug}"),
+      seriesPath: req(
+        "SOURCE_SERIES_PATH",
+        "/serie/{slug}/saison-{season}/episode-{episode}",
+      ),
+      userAgent: req(
+        "SOURCE_USER_AGENT",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      ),
+      cookies: process.env.SOURCE_COOKIES ?? "",
+    },
+    streamCacheTtl: Number(process.env.STREAM_CACHE_TTL ?? 7200),
+    proxyTokenTtl: Number(process.env.PROXY_TOKEN_TTL ?? 14400),
+    scraperConcurrency: Number(process.env.SCRAPER_CONCURRENCY ?? 3),
+  };
+}
+
+/** Soft check — returns null if config is incomplete instead of throwing. */
+export function tryGetConfig(): RuntimeConfig | null {
+  try {
+    return getConfig();
+  } catch {
+    return null;
+  }
 }
