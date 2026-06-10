@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cache_kv: {
+        Row: {
+          created_at: string
+          expires_at: string
+          k: string
+          v: Json
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          k: string
+          v: Json
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          k?: string
+          v?: Json
+        }
+        Relationships: []
+      }
+      scraper_lock: {
+        Row: {
+          created_at: string
+          expires_at: string
+          k: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          k: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          k?: string
+        }
+        Relationships: []
+      }
+      tmdb_mapping: {
+        Row: {
+          created_at: string
+          media_type: string
+          source_slug: string
+          tmdb_id: number
+        }
+        Insert: {
+          created_at?: string
+          media_type: string
+          source_slug: string
+          tmdb_id: number
+        }
+        Update: {
+          created_at?: string
+          media_type?: string
+          source_slug?: string
+          tmdb_id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
