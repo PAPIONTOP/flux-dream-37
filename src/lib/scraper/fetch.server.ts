@@ -76,6 +76,38 @@ export async function verifyStream(
   }
 }
 
+/** Recursively unwrap Livewire snapshot tuples like [value, {s:"arr"}]. */
+function unwrapLivewire(v: unknown): unknown {
+  if (
+    Array.isArray(v) &&
+    v.length === 2 &&
+    v[1] &&
+    typeof v[1] === "object" &&
+    ((v[1] as Record<string, unknown>).s === "arr" ||
+      (v[1] as Record<string, unknown>).s === "mdl")
+  ) {
+    return unwrapLivewire(v[0]);
+  }
+  if (Array.isArray(v)) return v.map(unwrapLivewire);
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(v as Record<string, unknown>)) {
+      out[k] = unwrapLivewire((v as Record<string, unknown>)[k]);
+    }
+    return out;
+  }
+  return v;
+}
+
+interface CinepulseVideo {
+  server_name?: string;
+  label?: string;
+  version?: string;
+  embed_type?: string;
+  type?: string;
+  link?: string;
+}
+
 export async function fetchCinepulseLinks(
   pageUrl: string,
   userAgent: string,
@@ -84,49 +116,48 @@ export async function fetchCinepulseLinks(
   const page = await fetchHtml(pageUrl, userAgent, "", 10000);
   if (page.status >= 400) return [];
   const $ = cheerio.load(page.html);
-  let wireId = "";
   let snapshot = "";
   $("[wire\\:snapshot]").each((_, el) => {
     const snap = $(el).attr("wire:snapshot") ?? "";
-    if (snap.includes("watch-component")) {
-      wireId = $(el).attr("wire:id") ?? "";
-      snapshot = snap;
-    }
+    if (snap.includes("watch-component")) snapshot = snap;
   });
-  if (!wireId || !snapshot) return [];
-  const livewireRes = await fetch("https://cinepulse.live/livewire/update", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "X-Livewire": "true",
-      "X-Requested-With": "XMLHttpRequest",
-      "Referer": pageUrl,
-      "Origin": "https://cinepulse.live",
-      "User-Agent": userAgent,
-    },
-    body: JSON.stringify({
-      _token: "",
-      components: [{ snapshot, updates: {}, calls: [] }],
-    }),
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!livewireRes.ok) return [];
-  const data = await livewireRes.json() as any;
+  if (!snapshot) return [];
+
   try {
-    const snapData = JSON.parse(data.components?.[0]?.snapshot ?? "{}");
-    const videos: any[] = snapData.data?.videos?.[0] ?? [];
+    const snapData = JSON.parse(snapshot) as { data?: { videos?: unknown } };
+    const unwrapped = unwrapLivewire(snapData.data?.videos) as unknown;
+    // After unwrapping, videos is a (possibly nested) array of video objects.
+    const flat: CinepulseVideo[] = [];
+    const collect = (v: unknown) => {
+      if (Array.isArray(v)) {
+        for (const item of v) collect(item);
+      } else if (v && typeof v === "object" && "link" in (v as object)) {
+        flat.push(v as CinepulseVideo);
+      }
+    };
+    collect(unwrapped);
+
     const langMap: Record<string, string[]> = {
-      vf: ["VF"],
+      vf: ["VF", "FRENCH", "TRUEFRENCH"],
       fr: ["FRENCH", "TRUEFRENCH", "VF"],
       vostfr: ["VOSTFR"],
       en: ["VOSTFR", "TRUEFRENCH"],
     };
-    const versions = langMap[lang.toLowerCase()] ?? ["VF", "FRENCH", "TRUEFRENCH", "VOSTFR"];
-    return videos
-      .filter((v: any) => versions.includes(v[0]?.version ?? ""))
-      .map((v: any) => v[0]?.link)
+    const versions =
+      langMap[lang.toLowerCase()] ?? ["VF", "FRENCH", "TRUEFRENCH", "VOSTFR"];
+
+    // Sort so preferred versions come first, keep original order otherwise.
+    const matched = flat
+      .filter((v) => versions.includes((v.version ?? "").toUpperCase()))
+      .sort(
+        (a, b) =>
+          versions.indexOf((a.version ?? "").toUpperCase()) -
+          versions.indexOf((b.version ?? "").toUpperCase()),
+      )
+      .map((v) => v.link!)
       .filter(Boolean);
+
+    return [...new Set(matched)];
   } catch {
     return [];
   }
