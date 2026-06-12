@@ -75,3 +75,59 @@ export async function verifyStream(
     return false;
   }
 }
+
+export async function fetchCinepulseLinks(
+  pageUrl: string,
+  userAgent: string,
+  lang: string,
+): Promise<string[]> {
+  const page = await fetchHtml(pageUrl, userAgent, "", 10000);
+  if (page.status >= 400) return [];
+  const $ = cheerio.load(page.html);
+  let wireId = "";
+  let snapshot = "";
+  $("[wire\\:snapshot]").each((_, el) => {
+    const snap = $(el).attr("wire:snapshot") ?? "";
+    if (snap.includes("watch-component")) {
+      wireId = $(el).attr("wire:id") ?? "";
+      snapshot = snap;
+    }
+  });
+  if (!wireId || !snapshot) return [];
+  const livewireRes = await fetch("https://cinepulse.live/livewire/update", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-Livewire": "true",
+      "X-Requested-With": "XMLHttpRequest",
+      "Referer": pageUrl,
+      "Origin": "https://cinepulse.live",
+      "User-Agent": userAgent,
+    },
+    body: JSON.stringify({
+      _token: "",
+      components: [{ snapshot, updates: {}, calls: [] }],
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!livewireRes.ok) return [];
+  const data = await livewireRes.json() as any;
+  try {
+    const snapData = JSON.parse(data.components?.[0]?.snapshot ?? "{}");
+    const videos: any[] = snapData.data?.videos?.[0] ?? [];
+    const langMap: Record<string, string[]> = {
+      vf: ["VF"],
+      fr: ["FRENCH", "TRUEFRENCH", "VF"],
+      vostfr: ["VOSTFR"],
+      en: ["VOSTFR", "TRUEFRENCH"],
+    };
+    const versions = langMap[lang.toLowerCase()] ?? ["VF", "FRENCH", "TRUEFRENCH", "VOSTFR"];
+    return videos
+      .filter((v: any) => versions.includes(v[0]?.version ?? ""))
+      .map((v: any) => v[0]?.link)
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
