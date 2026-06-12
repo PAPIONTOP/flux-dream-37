@@ -11,7 +11,7 @@ import { kv } from "../cache/kv.server";
 import { K, TTL } from "../cache/keys";
 import { slugify } from "../tmdb/slug";
 import { tmdb } from "../tmdb/client";
-import { fetchPage, verifyStream } from "./fetch.server";
+import { fetchPage, fetchCinepulseLinks, verifyStream } from "./fetch.server";
 import { FALLBACK_PROVIDER, pickProvider } from "./resolver.server";
 import type { StreamResult } from "./providers/_common";
 

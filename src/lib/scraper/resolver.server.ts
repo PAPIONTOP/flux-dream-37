@@ -6,8 +6,9 @@ import { uqload } from "./providers/uqload.server";
 import { streamtape } from "./providers/streamtape.server";
 import { doodstream } from "./providers/doodstream.server";
 import { voe } from "./providers/voe.server";
+import { vidzy } from "./providers/vidzy.server";
 
-export const PROVIDERS: Provider[] = [vidmoly, uqload, streamtape, doodstream, voe];
+export const PROVIDERS: Provider[] = [vidzy, vidmoly, uqload, streamtape, doodstream, voe];
 export const FALLBACK_PROVIDER: Provider = direct;
 
 export function pickProvider(url: string): Provider {
