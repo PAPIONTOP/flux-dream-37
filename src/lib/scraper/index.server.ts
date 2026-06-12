@@ -11,7 +11,7 @@ import { kv } from "../cache/kv.server";
 import { K, TTL } from "../cache/keys";
 import { slugify } from "../tmdb/slug";
 import { tmdb } from "../tmdb/client";
-import { fetchPage, verifyStream } from "./fetch.server";
+import { fetchPage, fetchCinepulseLinks, verifyStream } from "./fetch.server";
 import { FALLBACK_PROVIDER, pickProvider } from "./resolver.server";
 import type { StreamResult } from "./providers/_common";
 
@@ -80,6 +80,32 @@ async function walkAndExtract(
 ): Promise<StreamResult | null> {
   const cfg = getConfig();
   if (depth > MAX_IFRAME_DEPTH) return null;
+
+  // Cinepulse uses Livewire — bypass static HTML parsing
+  if (depth === 0 && /cinepulse\.live/i.test(url)) {
+    logger.info("scrape_cinepulse_livewire", { url, lang });
+    const links = await fetchCinepulseLinks(url, cfg.source.userAgent, lang);
+    logger.info("scrape_cinepulse_links", { count: links.length, links });
+    for (const link of links) {
+      logger.debug("scrape_cinepulse_try", { link });
+      try {
+        const provider = pickProvider(link);
+        const result = await provider.extract({
+          pageUrl: link,
+          lang,
+          userAgent: cfg.source.userAgent,
+          cookies: cfg.source.cookies,
+        });
+        if (result) return result;
+      } catch (e) {
+        logger.warn("scrape_cinepulse_provider_err", { link, err: String(e) });
+      }
+      const nested = await walkAndExtract(link, lang, depth + 1);
+      if (nested) return nested;
+    }
+    return null;
+  }
+
   logger.info("scrape_fetch", { url, depth });
   const page = await fetchPage(url, cfg.source.userAgent, cfg.source.cookies);
   if (page.status >= 400) {
