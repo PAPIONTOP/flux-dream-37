@@ -44,6 +44,8 @@ function buildPageUrl(
     .replace("{slug}", slug)
     .replace("{season}", String(season ?? 1))
     .replace("{episode}", String(episode ?? 1));
+  // Tolerate templates that already contain a full URL.
+  if (/^https?:\/\//i.test(path)) return path;
   return cfg.source.baseUrl + (path.startsWith("/") ? path : "/" + path);
 }
 
