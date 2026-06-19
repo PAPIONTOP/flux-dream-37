@@ -2,8 +2,9 @@
  * Dean Edwards p.a.c.k.e.r unpacker. Pure JS, no eval.
  * Returns the unpacked source string, or null if input doesn't match.
  */
+// Matches: }('PAYLOAD',BASE,COUNT,'SYMTAB'.split('|') — supports \' escapes.
 const PACKED_RE =
-  /\}\s*\(\s*'([^']+)'\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*'([^']*)'\s*\.split\('\|'\)/;
+  /\}\s*\(\s*'((?:\\.|[^'\\])*)'\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*'((?:\\.|[^'\\])*)'\s*\.split\('\|'\)/;
 
 function baseN(n: number, base: number): string {
   if (n < base) {
