@@ -22,6 +22,7 @@ export const vidzy: Provider = {
       lang: ctx.lang ?? "vf",
       provider: "vidzy",
       type: "hls",
+      referer: dlUrl,
     };
   },
 };

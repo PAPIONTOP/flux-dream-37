@@ -5,6 +5,8 @@ export interface StreamResult {
   lang: string; // e.g. "vf", "vostfr", "en"
   provider: string;
   type: "hls";
+  /** Provider page to send as Referer when the HLS URL must be proxied. */
+  referer?: string;
 }
 
 export interface ProviderContext {
