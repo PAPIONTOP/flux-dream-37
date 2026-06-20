@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { scrapeStream } from "@/lib/scraper/test.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -235,10 +235,22 @@ function ResultView({ result }: { result: Result }) {
             {result.title && <div className="font-medium">{result.title}</div>}
             {result.ok ? (
               <>
+                <StreamPlayer src={result.stream.proxyUrl} />
                 <Field label="Provider" value={result.stream.provider} />
                 <Field label="Quality" value={result.stream.quality} />
                 <Field label="Lang" value={result.stream.lang} />
                 <Field label="Type" value={result.stream.type} />
+                <div className="space-y-1">
+                  <div className="text-xs uppercase text-muted-foreground">Playable proxy URL</div>
+                  <a
+                    href={result.stream.proxyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block break-all rounded-md bg-muted px-2 py-1.5 text-xs text-primary underline"
+                  >
+                    {result.stream.proxyUrl}
+                  </a>
+                </div>
                 <div className="space-y-1">
                   <div className="text-xs uppercase text-muted-foreground">Stream URL</div>
                   <a
@@ -258,6 +270,68 @@ function ResultView({ result }: { result: Result }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function StreamPlayer({ src }: { src: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [status, setStatus] = useState("Loading player…");
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    let cancelled = false;
+    let hls: { destroy: () => void } | null = null;
+
+    async function load(media: HTMLVideoElement) {
+      setStatus("Loading stream…");
+      if (media.canPlayType("application/vnd.apple.mpegurl")) {
+        media.src = src;
+        media.load();
+        setStatus("");
+        return;
+      }
+
+      const HlsModule = await import("hls.js");
+      if (cancelled) return;
+      const Hls = HlsModule.default;
+      if (!Hls.isSupported()) {
+        setStatus("HLS playback is not supported in this browser.");
+        return;
+      }
+      const player = new Hls({ enableWorker: false, lowLatencyMode: false });
+      hls = player;
+      player.on(Hls.Events.MEDIA_ATTACHED, () => player.loadSource(src));
+      player.on(Hls.Events.MANIFEST_PARSED, () => setStatus(""));
+      player.on(
+        Hls.Events.ERROR,
+        (_event: unknown, data: { fatal?: boolean; details?: string }) => {
+          if (data.fatal) setStatus(data.details || "Stream playback failed.");
+        },
+      );
+      player.attachMedia(media);
+    }
+
+    load(video).catch((e) => setStatus(e instanceof Error ? e.message : String(e)));
+    return () => {
+      cancelled = true;
+      hls?.destroy();
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, [src]);
+
+  return (
+    <div className="space-y-2">
+      <video
+        ref={videoRef}
+        controls
+        playsInline
+        preload="metadata"
+        className="aspect-video w-full rounded-md bg-muted"
+      />
+      {status && <div className="text-xs text-muted-foreground">{status}</div>}
+    </div>
   );
 }
 

@@ -24,6 +24,7 @@ export const luluvid: Provider = {
       lang: ctx.lang ?? "vf",
       provider: "luluvid",
       type: "hls",
+      referer: r.finalUrl || ctx.pageUrl,
     };
   },
 };

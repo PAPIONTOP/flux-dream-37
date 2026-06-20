@@ -24,9 +24,7 @@ export const Route = createFileRoute("/api/public/v1/movie/")({
         const instance = url.pathname + url.search;
         try {
           requireApiKey(request);
-          const params = QuerySchema.parse(
-            Object.fromEntries(url.searchParams.entries()),
-          );
+          const params = QuerySchema.parse(Object.fromEntries(url.searchParams.entries()));
           if (!params.tmdb_id && !params.title) {
             throw new ApiError("BAD_REQUEST", "tmdb_id or title is required");
           }
@@ -56,7 +54,11 @@ export const Route = createFileRoute("/api/public/v1/movie/")({
           let proxyUrl: string | undefined;
           let expiresAt: string | undefined;
           if (params.mode === "proxy") {
-            const t = await signProxyToken({ u: stream.streamUrl, p: stream.provider });
+            const t = await signProxyToken({
+              u: stream.streamUrl,
+              r: stream.referer,
+              p: stream.provider,
+            });
             proxyUrl = `${proxyBase}/${t.token}/index.m3u8`;
             expiresAt = t.expiresAt;
           } else {

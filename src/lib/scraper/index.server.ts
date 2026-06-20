@@ -75,11 +75,7 @@ async function resolveSlug(opts: ResolveOpts): Promise<string> {
   return slug;
 }
 
-async function walkAndExtract(
-  url: string,
-  lang: string,
-  depth = 0,
-): Promise<StreamResult | null> {
+async function walkAndExtract(url: string, lang: string, depth = 0): Promise<StreamResult | null> {
   const cfg = getConfig();
   if (depth > MAX_IFRAME_DEPTH) return null;
 
@@ -175,8 +171,12 @@ export async function getStream(opts: ResolveOpts): Promise<ResolvedStream> {
   if (!opts.forceRefresh) {
     const hit = await kv.get<ResolvedStream>(cacheKey);
     if (hit) {
-      logger.info("scrape_cache_hit", { cacheKey });
-      return hit;
+      if (["luluvid", "vidzy"].includes(hit.provider) && !hit.referer) {
+        logger.info("scrape_cache_stale_missing_referer", { cacheKey, provider: hit.provider });
+      } else {
+        logger.info("scrape_cache_hit", { cacheKey });
+        return hit;
+      }
     }
   }
 
@@ -189,10 +189,7 @@ export async function getStream(opts: ResolveOpts): Promise<ResolvedStream> {
   try {
     const slug = await resolveSlug(opts);
     const pageUrl = buildPageUrl(slug, opts.mediaType, opts.season, opts.episode);
-    const result = await withRetry(
-      () => walkAndExtract(pageUrl, opts.lang),
-      "walkAndExtract",
-    );
+    const result = await withRetry(() => walkAndExtract(pageUrl, opts.lang), "walkAndExtract");
     if (!result) throw new ApiError("NO_STREAM_FOUND", `No stream detected at ${pageUrl}`);
 
     const ok = await verifyStream(result.streamUrl, cfg.source.userAgent, pageUrl);
