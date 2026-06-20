@@ -196,7 +196,11 @@ export async function getStream(opts: ResolveOpts): Promise<ResolvedStream> {
     if (!result) throw new ApiError("NO_STREAM_FOUND", `No stream detected at ${pageUrl}`);
 
     const ok = await verifyStream(result.streamUrl, cfg.source.userAgent, pageUrl);
-    if (!ok) throw new ApiError("STREAM_INVALID", `Stream URL not reachable: ${result.streamUrl}`);
+    if (!ok) {
+      logger.warn("stream_verify_failed", { url: result.streamUrl, provider: result.provider });
+      // Non-fatal: CDNs often reject HEAD/GET without provider-specific referer or from datacenter IPs.
+      // The extraction succeeded; let the client try to play it.
+    }
 
     const final: ResolvedStream = { ...result, fetchedAt: new Date().toISOString() };
     await kv.set(cacheKey, final, cfg.streamCacheTtl);
