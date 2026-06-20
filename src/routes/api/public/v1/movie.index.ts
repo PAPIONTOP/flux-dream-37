@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/public/v1/movie/")({
           let proxyUrl: string | undefined;
           let expiresAt: string | undefined;
           if (params.mode === "proxy") {
-            const t = await signProxyToken({ u: stream.streamUrl, p: stream.provider });
+            const t = await signProxyToken({ u: stream.streamUrl, r: stream.referer, p: stream.provider });
             proxyUrl = `${proxyBase}/${t.token}/index.m3u8`;
             expiresAt = t.expiresAt;
           } else {

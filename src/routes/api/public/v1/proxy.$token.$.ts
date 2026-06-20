@@ -46,7 +46,10 @@ async function proxyRequest(
       accept: "*/*",
     };
     if (range) upstreamHeaders.range = range;
-    if (claims.r) upstreamHeaders.referer = claims.r;
+    if (claims.r) {
+      upstreamHeaders.referer = claims.r;
+      upstreamHeaders.origin = new URL(claims.r).origin;
+    }
 
     const res = await fetch(upstream, {
       method: headOnly ? "HEAD" : "GET",
