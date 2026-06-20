@@ -299,10 +299,10 @@ function StreamPlayer({ src }: { src: string }) {
         setStatus("HLS playback is not supported in this browser.");
         return;
       }
-      const player = new Hls({ enableWorker: true, lowLatencyMode: false });
+      const player = new Hls({ enableWorker: false, lowLatencyMode: false });
       hls = player;
-      player.loadSource(src);
       player.attachMedia(media);
+      player.on(Hls.Events.MEDIA_ATTACHED, () => player.loadSource(src));
       player.on(Hls.Events.MANIFEST_PARSED, () => setStatus(""));
       player.on(
         Hls.Events.ERROR,
