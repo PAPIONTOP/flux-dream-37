@@ -283,11 +283,11 @@ function StreamPlayer({ src }: { src: string }) {
     let cancelled = false;
     let hls: { destroy: () => void } | null = null;
 
-    async function load() {
+    async function load(media: HTMLVideoElement) {
       setStatus("Loading stream…");
-      if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = src;
-        video.load();
+      if (media.canPlayType("application/vnd.apple.mpegurl")) {
+        media.src = src;
+        media.load();
         setStatus("");
         return;
       }
@@ -302,14 +302,14 @@ function StreamPlayer({ src }: { src: string }) {
       const player = new Hls({ enableWorker: true, lowLatencyMode: false });
       hls = player;
       player.loadSource(src);
-      player.attachMedia(video);
+      player.attachMedia(media);
       player.on(Hls.Events.MANIFEST_PARSED, () => setStatus(""));
       player.on(Hls.Events.ERROR, (_event: unknown, data: { fatal?: boolean; details?: string }) => {
         if (data.fatal) setStatus(data.details || "Stream playback failed.");
       });
     }
 
-    load().catch((e) => setStatus(e instanceof Error ? e.message : String(e)));
+    load(video).catch((e) => setStatus(e instanceof Error ? e.message : String(e)));
     return () => {
       cancelled = true;
       hls?.destroy();
