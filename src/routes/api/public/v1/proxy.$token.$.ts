@@ -58,6 +58,17 @@ async function proxyRequest(
     });
 
     const ct = res.headers.get("content-type") ?? "";
+    if (!res.ok) {
+      return new Response(`Upstream stream returned ${res.status}`, {
+        status: 502,
+        headers: {
+          ...CORS,
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+        },
+      });
+    }
+
     const isPlaylist =
       /application\/vnd\.apple\.mpegurl|application\/x-mpegurl|audio\/mpegurl/i.test(ct) ||
       /\.m3u8(\?|$)/i.test(upstream);
@@ -66,6 +77,16 @@ async function proxyRequest(
 
     if (isPlaylist && !headOnly) {
       const body = await res.text();
+      if (!body.trimStart().startsWith("#EXTM3U")) {
+        return new Response("Upstream did not return a valid HLS playlist", {
+          status: 502,
+          headers: {
+            ...CORS,
+            "content-type": "text/plain; charset=utf-8",
+            "cache-control": "no-store",
+          },
+        });
+      }
       const rewritten = await rewritePlaylist(body, upstream, proxyBase, claims.r);
       return new Response(rewritten, {
         status: 200,
