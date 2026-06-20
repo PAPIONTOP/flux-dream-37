@@ -175,8 +175,12 @@ export async function getStream(opts: ResolveOpts): Promise<ResolvedStream> {
   if (!opts.forceRefresh) {
     const hit = await kv.get<ResolvedStream>(cacheKey);
     if (hit) {
+      if (["luluvid", "vidzy"].includes(hit.provider) && !hit.referer) {
+        logger.info("scrape_cache_stale_missing_referer", { cacheKey, provider: hit.provider });
+      } else {
       logger.info("scrape_cache_hit", { cacheKey });
       return hit;
+      }
     }
   }
 
