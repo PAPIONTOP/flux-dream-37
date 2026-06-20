@@ -301,7 +301,6 @@ function StreamPlayer({ src }: { src: string }) {
       }
       const player = new Hls({ enableWorker: false, lowLatencyMode: false });
       hls = player;
-      player.attachMedia(media);
       player.on(Hls.Events.MEDIA_ATTACHED, () => player.loadSource(src));
       player.on(Hls.Events.MANIFEST_PARSED, () => setStatus(""));
       player.on(
@@ -310,6 +309,7 @@ function StreamPlayer({ src }: { src: string }) {
           if (data.fatal) setStatus(data.details || "Stream playback failed.");
         },
       );
+      player.attachMedia(media);
     }
 
     load(video).catch((e) => setStatus(e instanceof Error ? e.message : String(e)));
