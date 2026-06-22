@@ -236,6 +236,14 @@ function ResultView({ result }: { result: Result }) {
             {result.ok ? (
               <>
                 <StreamPlayer src={result.stream.proxyUrl} />
+                {result.stream.embedUrl && (
+                  <Button asChild variant="secondary" size="sm">
+                    <a href={result.stream.embedUrl} target="_blank" rel="noreferrer">
+                      <Play className="mr-2 h-4 w-4" />
+                      Ouvrir l’embed vidéo
+                    </a>
+                  </Button>
+                )}
                 <Field label="Provider" value={result.stream.provider} />
                 <Field label="Quality" value={result.stream.quality} />
                 <Field label="Lang" value={result.stream.lang} />
