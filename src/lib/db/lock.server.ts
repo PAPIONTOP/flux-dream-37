@@ -26,9 +26,15 @@ export const lock = {
       .from("scraper_lock" as never)
       .insert({ k: key, expires_at } as never);
     if (error) {
-      // Most likely PK conflict — lock is held.
-      logger.debug("lock_busy", { key });
-      return false;
+      // PK conflict (23505) = lock is held. Any other error = misconfig — log loudly.
+      const code = (error as { code?: string }).code;
+      if (code === "23505") {
+        logger.debug("lock_busy", { key });
+        return false;
+      }
+      logger.error("lock_acquire_error", { key, code, message: error.message, details: (error as { details?: string }).details });
+      // Don't block scraping on infra errors — treat as acquired.
+      return true;
     }
     return true;
   },
