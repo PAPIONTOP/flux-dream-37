@@ -275,7 +275,7 @@ function ResultView({ result }: { result: Result }) {
 
 function StreamPlayer({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [status, setStatus] = useState("Loading player…");
+  const [status, setStatus] = useState("Lecteur en chargement…");
 
   useEffect(() => {
     const video = videoRef.current;
@@ -284,7 +284,7 @@ function StreamPlayer({ src }: { src: string }) {
     let hls: { destroy: () => void } | null = null;
 
     async function load(media: HTMLVideoElement) {
-      setStatus("Loading stream…");
+      setStatus("Chargement du flux…");
       if (media.canPlayType("application/vnd.apple.mpegurl")) {
         media.src = src;
         media.load();
@@ -296,7 +296,7 @@ function StreamPlayer({ src }: { src: string }) {
       if (cancelled) return;
       const Hls = HlsModule.default;
       if (!Hls.isSupported()) {
-        setStatus("HLS playback is not supported in this browser.");
+        setStatus("La lecture HLS n’est pas supportée dans ce navigateur.");
         return;
       }
       const player = new Hls({ enableWorker: false, lowLatencyMode: false });
@@ -305,8 +305,15 @@ function StreamPlayer({ src }: { src: string }) {
       player.on(Hls.Events.MANIFEST_PARSED, () => setStatus(""));
       player.on(
         Hls.Events.ERROR,
-        (_event: unknown, data: { fatal?: boolean; details?: string }) => {
-          if (data.fatal) setStatus(data.details || "Stream playback failed.");
+        (_event: unknown, data: { fatal?: boolean; details?: string; response?: { code?: number } }) => {
+          if (data.fatal) {
+            const code = data.response?.code;
+            setStatus(
+              code === 502
+                ? "Le CDN vidéo refuse la connexion du proxy. Utilise le bouton Ouvrir l’embed ci-dessous."
+                : data.details || "La lecture du flux a échoué.",
+            );
+          }
         },
       );
       player.attachMedia(media);
