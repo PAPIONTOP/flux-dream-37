@@ -58,6 +58,7 @@ export const scrapeStream = createServerFn({ method: "POST" })
         poster,
         stream: {
           ...stream,
+          embedUrl: stream.embedUrl ?? stream.referer,
           proxyUrl,
           proxyExpiresAt: proxyToken.expiresAt,
         },
