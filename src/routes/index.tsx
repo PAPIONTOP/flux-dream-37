@@ -237,12 +237,22 @@ function ResultView({ result }: { result: Result }) {
               <>
                 <StreamPlayer src={result.stream.proxyUrl} />
                 {result.stream.embedUrl && (
-                  <Button asChild variant="secondary" size="sm">
-                    <a href={result.stream.embedUrl} target="_blank" rel="noreferrer">
-                      <Play className="mr-2 h-4 w-4" />
-                      Ouvrir l’embed vidéo
-                    </a>
-                  </Button>
+                  <div className="space-y-2">
+                    <iframe
+                      src={result.stream.embedUrl}
+                      title={`${result.title || "Video"} embed`}
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      referrerPolicy="origin"
+                      className="aspect-video w-full rounded-md border border-border bg-muted"
+                    />
+                    <Button asChild variant="secondary" size="sm">
+                      <a href={result.stream.embedUrl} target="_blank" rel="noreferrer">
+                        <Play className="mr-2 h-4 w-4" />
+                        Ouvrir l’embed vidéo
+                      </a>
+                    </Button>
+                  </div>
                 )}
                 <Field label="Provider" value={result.stream.provider} />
                 <Field label="Quality" value={result.stream.quality} />
