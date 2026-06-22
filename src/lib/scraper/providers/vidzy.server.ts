@@ -18,6 +18,7 @@ export const vidzy: Provider = {
     if (!m) return null;
     return {
       streamUrl: m[1],
+      embedUrl: ctx.pageUrl,
       quality: guessQuality(m[1]),
       lang: ctx.lang ?? "vf",
       provider: "vidzy",

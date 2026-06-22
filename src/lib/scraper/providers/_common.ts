@@ -1,6 +1,8 @@
 /** Provider interface shared by all extractors. */
 export interface StreamResult {
   streamUrl: string;
+  /** Original provider embed page; useful when the CDN blocks server-side proxy fetches. */
+  embedUrl?: string;
   quality: string; // e.g. "1080p", "720p", "auto"
   lang: string; // e.g. "vf", "vostfr", "en"
   provider: string;

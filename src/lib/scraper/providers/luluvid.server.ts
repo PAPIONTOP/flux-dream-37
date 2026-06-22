@@ -20,6 +20,7 @@ export const luluvid: Provider = {
     if (!m) return null;
     return {
       streamUrl: m[1],
+      embedUrl: r.finalUrl || ctx.pageUrl,
       quality: guessQuality(m[1]),
       lang: ctx.lang ?? "vf",
       provider: "luluvid",
