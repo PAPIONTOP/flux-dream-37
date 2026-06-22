@@ -173,6 +173,8 @@ export async function getStream(opts: ResolveOpts): Promise<ResolvedStream> {
     if (hit) {
       if (["luluvid", "vidzy"].includes(hit.provider) && !hit.referer) {
         logger.info("scrape_cache_stale_missing_referer", { cacheKey, provider: hit.provider });
+      } else if (["luluvid", "vidzy"].includes(hit.provider) && !hit.embedUrl) {
+        logger.info("scrape_cache_stale_missing_embed", { cacheKey, provider: hit.provider });
       } else {
         logger.info("scrape_cache_hit", { cacheKey });
         return hit;
