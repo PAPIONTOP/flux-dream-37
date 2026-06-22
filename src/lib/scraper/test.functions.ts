@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+
 import { z } from "zod";
 import { tmdb } from "@/lib/tmdb/client";
 import { getStream } from "@/lib/scraper/index.server";
@@ -45,16 +45,13 @@ export const scrapeStream = createServerFn({ method: "POST" })
         title,
         forceRefresh: data.forceRefresh,
       });
-      const request = getRequest();
-      const origin = request ? new URL(request.url).origin : "";
       const proxyToken = await signProxyToken({
         u: stream.streamUrl,
         r: stream.referer,
         p: stream.provider,
       });
-      const proxyUrl = origin
-        ? `${origin}/api/public/v1/proxy/${proxyToken.token}/index.m3u8`
-        : `/api/public/v1/proxy/${proxyToken.token}/index.m3u8`;
+      // Relative URL — the browser resolves it against its own origin.
+      const proxyUrl = `/api/public/v1/proxy/${proxyToken.token}/index.m3u8`;
       return {
         ok: true as const,
         title: displayTitle,
